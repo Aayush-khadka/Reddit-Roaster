@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
-app.use("/", roastRoutes);
+app.use("/api/v1", roastRoutes);
 
 // app.listen(PORT, () => {
 //   console.log(`Server is running at http://localhost:${PORT}`);
