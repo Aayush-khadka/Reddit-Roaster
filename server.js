@@ -1,14 +1,28 @@
 import express from "express";
 import dotenv from "dotenv";
-// import { generateRoast } from "./src/Controllers/roast.controller.js";
+import cors from "cors";
 import roastRoutes from "./src/routes/roast.routes.js";
 
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
+
+app.use(express.json());
+
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: false,
+  })
+);
 
 app.use("/api/v1", roastRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Reddit Roaster backend is live 🔥");
+});
+
 app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
