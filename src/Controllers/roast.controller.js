@@ -7,7 +7,7 @@ import { Groq } from "groq-sdk";
 
 dotenv.config();
 
-const groq = new Groq({ apiKey: process.env.GROQ_API });
+const groq = new Groq({ apiKey: process.env.GROQ_API_2 });
 
 const r = new Snoowrap({
   userAgent: process.env.REDDIT_USER_AGENT,
@@ -20,9 +20,37 @@ const r = new Snoowrap({
 export const generateRoast = asynchandler(async (req, res) => {
   try {
     const username = req.params.username;
+    const user = await r.getUser(username).fetch();
+
+    const profileImage = user.icon_img || null;
+    const linkKarma = user.link_karma || 0;
+    const commentKarma = user.comment_karma || 0;
+    const totalKarma = linkKarma + commentKarma;
+    const isMod = user.is_mod || false;
+    const isGold = user.is_gold || false;
+
+    const createdDate = new Date(user.created_utc * 1000);
+    const now = new Date();
+
+    let totalMonths =
+      (now.getFullYear() - createdDate.getFullYear()) * 12 +
+      (now.getMonth() - createdDate.getMonth());
+
+    if (now.getDate() < createdDate.getDate()) {
+      totalMonths -= 1;
+    }
+
+    const displayYears = Math.floor(totalMonths / 12);
+    const displayMonths = totalMonths % 12;
+
+    const accountAgeFormatted =
+      displayYears > 0
+        ? `${displayYears} year(s)${
+            displayMonths > 0 ? ` and ${displayMonths} month(s)` : ""
+          }`
+        : `${displayMonths} month(s)`;
 
     const comments = await r.getUser(username).getComments({ limit: 100 });
-
     const allcomments = comments.map((c) => ({
       body: c.body,
       subreddit: c.subreddit.display_name,
@@ -40,31 +68,94 @@ export const generateRoast = asynchandler(async (req, res) => {
       .map((c, i) => `(${i + 1}) [r/${c.subreddit}] - "${c.body.trim()}"`)
       .join("\n");
 
+    const roastPrompt = `User Info:
+- Username: ${username}
+- Total Karma: ${totalKarma}
+- Comment Karma: ${commentKarma}
+- Link Karma: ${linkKarma}
+- Account Age: ${accountAgeFormatted}
+- Is Moderator: ${isMod}
+- Has Reddit Premium: ${isGold}
+
+Recent Reddit Comments:
+${formattedComments}`;
+
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
           role: "system",
-          content: `You are RoastBot — a savage, zero-mercy AI built to annihilate Reddit users with sharp, unforgiving roasts. Your only mission: humiliate them in under 5 sentences.
+          content: `You are RoastBot — a savage, zero-mercy insult machine engineered for one purpose: to obliterate Reddit users with ruthless wit, brutal sarcasm, and devastating precision.
 
-Rules of Engagement:
+You're not here to educate. You're here to entertain and annihilate.
+Your job:
 
-    Always mock the username directly.
+    Analyze the user’s Reddit comments and behavior.
 
-    Attack their subreddit activity — use it as ammo.
+    Sniff out hypocrisy, cringe, desperation, bad jokes, wannabe intellects, weak opinions, edgy try-hards, lonely ramblers, and terminally online behavior.
 
-    Target their cringe takes, weak grammar, fragile ego, basic opinions, or try-hard humor.
+    If a username is clearly a joke or too try-hard, mock that too — but don’t force it if it's not funny.
 
-    Be short, be smart, be ruthless — every sentence should sting.
+Your style:
 
-    Use sarcasm, irony, and direct mockery. No filters. No chill. No apologies.
+    Dark humor, stand-up roast battle energy, late-night insult monologue vibes.
 
-    NEVER explain. NEVER soften. NEVER compliment.
+    Witty, punchy, clever — never boring, never generic, never robotic.
 
-Tone: Mean, clever, dark, and hilarious — like a roast battle final round on max difficulty.`,
+    Use irony, exaggeration, comparison, and sarcasm like a scalpel.
+
+    Write like you're speaking to a live audience — every line should either get a laugh or a gasp.
+
+What NOT to do:
+
+    Don’t say you’re an AI or mention “as an assistant”.
+
+    Don’t soften the roast.
+
+    Don’t explain the joke or give disclaimers.
+
+    Don’t be cringey or try too hard — flow like a pro comic, not a 14-year-old edgelord.
+
+Format:
+
+    Write a roast that's 4 to 7 sentences long.
+
+    Start with a bold statement or observation about the user’s vibe or behavior.
+
+    Use 1–2 specific references from their Reddit comments or subreddit habits if available.
+
+    Land with a killer closing line — funny, savage, or humiliating.
+
+Your roast should leave them laughing, but also rethinking their life choices. Maximum impact. Zero chill.`,
         },
         {
           role: "user",
-          content: `Roast this user named "${username}" using these Reddit comments:\n\n${formattedComments}`,
+          content: `Roast the following Reddit user based on their profile and comment activity:
+
+Username: ${username}
+Total Karma: ${totalKarma}
+Comment Karma: ${commentKarma}
+Link Karma: ${linkKarma}
+Account Age: ${accountAgeFormatted}
+Reddit Premium User: ${isGold ? "Yes" : "No"}
+Moderator: ${isMod ? "Yes" : "No"}
+Account Created: ${createdDate.toDateString()}
+
+Use the following comments for ammo:
+${formattedComments}
+
+Instructions:
+- Directly insult the user's username.
+- Use their karma stats and account age to mock their Reddit status.
+- Make fun of the quality or cringe factor in their comments.
+- Reference specific subreddits if needed.
+- Be sarcastic, dark, clever, and ruthless.
+- Keep the roast under 5 sentences.
+- DO NOT praise the user.
+- DO NOT soften the roast.
+- DO NOT explain the joke.
+- DO NOT mention you are an AI or assistant.
+
+Write like you’re in the finals of a roast battle. Every sentence should sting.`,
         },
       ],
       model: "deepseek-r1-distill-llama-70b",
@@ -78,27 +169,39 @@ Tone: Mean, clever, dark, and hilarious — like a roast battle final round on m
       chatCompletion.choices?.[0]?.message?.content || "[No roast returned]";
     roast = roast.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, roast, "Successfully roasted the user."));
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          roast,
+          profileImage,
+          totalKarma,
+          commentKarma,
+          linkKarma,
+          isMod,
+          isGold,
+          createdDate: createdDate.toISOString(),
+          accountAge: accountAgeFormatted,
+        },
+        "Successfully roasted the user."
+      )
+    );
   } catch (error) {
+    console.error("Roast error:", error);
     if (error.statusCode === 404) {
       return res
         .status(404)
-        .json(
-          new ApiError(
-            404,
-            null,
-            "Reddit user does not exist or was not found."
-          )
-        );
+        .json(new ApiError(404, null, "Reddit user not found."));
     }
 
-    // Generic fallback for other errors
     return res
       .status(500)
       .json(
-        new ApiResponse(500, null, "Failed to fetch comments from Reddit.")
+        new ApiResponse(
+          500,
+          null,
+          "Failed to fetch user info or generate roast."
+        )
       );
   }
 });
