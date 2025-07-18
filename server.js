@@ -11,8 +11,9 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ["https://grillmyreddit.vercel.app/"],
+    origin: ["https://grillmyreddit.vercel.app", "http://localhost:3000"],
     methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
     credentials: false,
   })
 );
