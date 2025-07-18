@@ -3,7 +3,7 @@ class ApiResponse {
     this.statuscode = statuscode;
     this.data = data;
     this.message = message;
-    this.stauscode = statuscode < 400;
+    this.statuscode = statuscode < 400;
   }
 }
 
