@@ -2,11 +2,9 @@
   "name": "reddit-roaster",
   "version": "1.0.0",
   "description": "Let the Bot Roast your reddit profile",
-  "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon index.js"
+    "dev": "vercel dev"
   },
   "author": "Aayush Khadka",
   "license": "ISC",
