@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import roastRoutes from "./src/roast.routes.js";
+import roastRoutes from "./roast.routes.js";
 
 import serverless from "serverless-http";
 
