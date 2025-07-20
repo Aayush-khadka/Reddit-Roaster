@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import roastRoutes from "../src/routes/roast.routes.js";
+import roastRoutes from "./src/routes/roast.routes.js";
 import serverless from "serverless-http"; // ✅ This is the key part
 
 dotenv.config();
