@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import roastRoutes from "./src/routes/roast.routes.js";
-import serverless from "serverless-http"; // ✅ This is the key part
+import roastRoutes from "../src/routes/roast.routes.js";
+import serverless from "serverless-http";
 
 dotenv.config();
 
@@ -25,5 +25,5 @@ app.get("/", (req, res) => {
   res.send("Reddit Roaster backend is live 🔥");
 });
 
-// ✅ Export a serverless handler instead of listening on a port
-export const handler = serverless(app);
+// ✅ THIS is what Vercel requires:
+export default serverless(app);
