@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { generateRoast } from "../roast.controller.js";
+import { generateRoast } from "./roast.controller.js";
 
 const router = express.Router();
 
