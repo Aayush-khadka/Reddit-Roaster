@@ -20,5 +20,8 @@
     "nodemon": "^3.1.10",
     "openai": "^5.10.1",
     "snoowrap": "^1.15.2"
+  },
+  "devDependencies": {
+    "@vercel/node": "^5.3.6"
   }
 }
