@@ -1,7 +1,8 @@
 import Snoowrap from "snoowrap";
-import { asynchandler } from "../../utils/asyncHandler.js";
-import { ApiResponse } from "../../utils/ApiResponse.js";
-import { ApiError } from "../../utils/ApiError.js";
+// Fix the utils import paths - since utils is at root level, not inside src
+import { asynchandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 import dotenv from "dotenv";
 import { Groq } from "groq-sdk";
 
@@ -39,10 +40,10 @@ Style:
 - Think Jeselnik + a pissed Nepali uncle.
 - Use shocking metaphors, cultural jabs, twisted humor.
 - NSFW is allowed — clever filth only.
-- Include Nepali burns when fitting (“confidence of a traffic cop in rain”, “mamaghar energy”, “Melamchi-level delusion”).
+- Include Nepali burns when fitting ("confidence of a traffic cop in rain", "mamaghar energy", "Melamchi-level delusion").
 
 Never:
-- Use cliché roasts like “mom’s basement”, “touch grass”, “participation trophy”
+- Use cliché roasts like "mom's basement", "touch grass", "participation trophy"
 - Repeat punchlines or formats
 - Mention AI or apologize
 - Soften tone or compliment the user
@@ -64,7 +65,7 @@ Instructions:
 - DO NOT explain the joke
 - DO NOT mention you are an AI or assistant
 
-Be creative. Vary tone and delivery. Every roast should feel handcrafted. You’re not a bot — you’re the final boss of the internet. Make them regret logging in.`;
+Be creative. Vary tone and delivery. Every roast should feel handcrafted. You're not a bot — you're the final boss of the internet. Make them regret logging in.`;
 
 async function tryGroqRequest(payload) {
   for (let i = 0; i < groqKeys.length; i++) {

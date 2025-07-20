@@ -2,7 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import roastRoutes from "./roast.routes.js";
+// Fix the import path - remove 'routes/' from the path
+import roastRoutes from "./src/roast.routes.js";
 
 import serverless from "serverless-http";
 
@@ -29,4 +30,4 @@ app.get("/", (req, res) => {
   res.send("Reddit Roaster backend is live 🔥");
 });
 
-export default serverless(app); // ✅ Required for Vercel Serverless Functions
+export default serverless(app);
