@@ -1,7 +1,7 @@
 import Snoowrap from "snoowrap";
-import { asynchandler } from "../../../utils/asyncHandler.js";
-import { ApiResponse } from "../../../utils/ApiResponse.js";
-import { ApiError } from "../../../utils/ApiError.js";
+import { asynchandler } from "../../utils/asyncHandler.js";
+import { ApiResponse } from "../../utils/ApiResponse.js";
+import { ApiError } from "../../utils/ApiError.js";
 import dotenv from "dotenv";
 import { Groq } from "groq-sdk";
 
